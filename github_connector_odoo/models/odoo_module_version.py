@@ -209,6 +209,13 @@ class OdooModuleVersion(models.Model):
 
     full_module_path = fields.Char(string="Full Local Path to the module",)
 
+    analysis_rule_info_ids = fields.One2many(
+        string="Analysis Rule Info ids",
+        comodel_name="odoo.module.version.rule.info",
+        ondelete="cascade",
+        readonly=True,
+    )
+
     # Overload Section
     def unlink(self):
         # Analyzed repository branches should be reanalyzed
@@ -500,3 +507,15 @@ class OdooModuleVersion(models.Model):
         for module_version in self:
             module_version.unlink()
         return True
+
+
+class OdooModuleVersionRuleInfo(models.TransientModel):
+    _inherit = "github.analysis.rule.info.mixin"
+    _name = "odoo.module.version.rule.info"
+    _description = " Odoo Module Vesion Rule Info"
+
+    module_version_id = fields.Many2one(
+        string="Module Version",
+        comodel_name="odoo.module.version",
+        inverse_name="module_version_id",
+    )
